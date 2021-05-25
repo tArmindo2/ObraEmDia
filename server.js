@@ -25,12 +25,12 @@ server.get('/', async function(request, response) { //request vem do cliente par
     response.json(contatos);
 })
 
-//localhost:3000/
-//server.get('/:id', function(request, response) { //consultando pelo id
-//    const id = request.params.id;
-//    const result = contatos.filter(contato => contato.id == id);
-//    response.json(result);
-//})
+//localhost:3000/1
+server.get('/:id', async function(request, response) { //consultando pelo id
+    const id = request.params.id;
+    const contato = await database.find(id);
+    response.json(contato);
+})
 
 server.post('/', async function(request, response){
     const {nome, telefone} = request.body;
