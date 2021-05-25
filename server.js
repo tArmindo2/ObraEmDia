@@ -26,13 +26,13 @@ server.get('/', async function(request, response) { //request vem do cliente par
 })
 
 //localhost:3000/
-server.get('/:id', function(request, response) { //consultando pelo id
-    const id = request.params.id;
-    const result = contatos.filter(contato => contato.id == id);
-    response.json(result);
-})
+//server.get('/:id', function(request, response) { //consultando pelo id
+//    const id = request.params.id;
+//    const result = contatos.filter(contato => contato.id == id);
+//    response.json(result);
+//})
 
-server.post('/', function(request, response){
+server.post('/', async function(request, response){
     const {nome, telefone} = request.body;
 
     const result = await database.create(nome, telefone);
