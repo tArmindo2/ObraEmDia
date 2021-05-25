@@ -14,6 +14,7 @@ server.use(express.json()); //
 
 contatos = [];
 
+// localhost:3000/
 server.get('/', function(request, response) { //request vem do cliente para o servidor, response vem do servidor para o cliente
 
 
@@ -24,9 +25,11 @@ server.get('/', function(request, response) { //request vem do cliente para o se
     response.json(contatos);
 })
 
+//localhost:3000/
 server.get('/:id', function(request, response) { //consultando pelo id
     const id = request.params.id;
-    response.json(id);
+    const result = contatos.filter(contato => contato.id == id);
+    response.json(result);
 })
 
 server.post('/', function(request, response){
