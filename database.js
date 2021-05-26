@@ -18,6 +18,33 @@ const pool = new Pool({
 //    console.log('Tabela criada com sucesso');
 //})
 
+//CRIAÇAO TABELAS NO BANCO
+//USUARIOS - const script = 'create table usuarios (id_usuario serial, login varchar (20) not null unique, senha varchar (20) not null, email varchar (50) not null unique, tipo bit not null, primary key(id_usuario))'; //tipo: -- 0 = cliente / 1 = empresa
+//CLIENTES - const script = 'CREATE TABLE IF NOT EXISTS clientes (id_cliente int not null, nome_cliente varchar (100), telefone varchar (12), primary key (id_cliente), foreign key (id_cliente) references usuarios (id_usuario))'
+//EMPRESAS - const script = 'CREATE TABLE IF NOT EXISTS empresas (id_empresa int not null, nome_empresa varchar (100) not null, descricao varchar (500) not null, telefone_um varchar (12) not null, telefone_dois varchar (12), estado varchar (100) not null, cidade varchar (500) not null, endereco varchar (500) not null, primary key (id_empresa), foreign key (id_empresa) references usuarios (id_usuario))' 
+//OBRAS - 
+//ETAPAS -
+
+//CRIAÇAO PROCEDURES
+//Clientes
+//const script = 'CREATE OR REPLACE FUNCTION addCliente (login varchar (20), senha varchar (20), email varchar(50), tipo bit, nome_cliente varchar (100), telefone varchar (12)) RETURNS void AS $$ BEGIN INSERT INTO usuarios VALUES (DEFAULT, login, senha, email, tipo); INSERT INTO clientes VALUES (LASTVAL(), nome_cliente, telefone); END $$ LANGUAGE plpgsql';
+//Empresas
+//const script = 'CREATE OR REPLACE FUNCTION addEmpresa (login varchar (20), senha varchar (20), email varchar(50), tipo bit, nome_empresa varchar (100), descricao varchar (500), telefone_um varchar (12), telefone_dois varchar (12), estado varchar (100), cidade varchar (500), endereco varchar (500)) RETURNS void AS $$ BEGIN INSERT INTO usuarios VALUES (DEFAULT, login, senha, email, tipo); INSERT INTO empresas VALUES (LASTVAL(), nome_empresa, descricao, telefone_um, telefone_dois, estado, cidade, endereco); END $$ LANGUAGE plpgsql';
+
+/*   pool.query(script, function(error, result){
+    if(error)
+        throw error;
+    
+    console.log('Tabela criada com sucesso');
+})   */
+
+ /*  pool.query(script, function(error, result){
+    if(error)
+        throw error;
+    
+    console.log('Procedure criada com sucesso');
+})   */
+
 module.exports = {
 
     async create(nome, telefone){
@@ -53,7 +80,45 @@ module.exports = {
         const sql = 'DELETE FROM contatos WHERE ID = $1';
         const result = await pool.query(sql,[id]);
         return result.rows;
-    }
+    },
+
+    //MODULO DE CRIAÇÃO DO CLIENTE
+    async createCliente(login, senha, email, tipo, nome_cliente, telefone){
+        try{
+            const sql = 'SELECT addCliente ($1, $2, $3, $4, $5, $6)';
+            const result = await pool.query(sql,[login, senha, email, tipo, nome_cliente, telefone]);
+            return result.rows;
+        }catch(error){
+            console.log(error);
+            return -1;
+        }
+    },
+
+    //MODULO DE LEITURA DO USUARIO + CLIENTE
+    async readCliente(){
+        const sql = 'SELECT * FROM usuarios INNER JOIN clientes ON usuarios.id_usuario = clientes.id_cliente';
+        const result = await pool.query(sql);
+        return result.rows;
+    },
+
+    //MODULO DE CRIAÇAO DE EMPRESA
+    async createEmpresa(login, senha, email, tipo, nome_empresa, descricao, telefone_um, telefone_dois, estado, cidade, endereco){
+        try{
+            const sql = 'SELECT addEmpresa ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)';
+            const result = await pool.query(sql,[login, senha, email, tipo, nome_empresa, descricao, telefone_um, telefone_dois, estado, cidade, endereco]);
+            return result.rows;
+        }catch(error){
+            console.log(error);
+            return -1;
+        }
+    },
+
+    //MODULO DE LEITURA DO USUARIO + EMPRESA
+    async readEmpresa(){
+        const sql = 'SELECT * FROM usuarios INNER JOIN empresas ON usuarios.id_usuario = empresas.id_empresa';
+        const result = await pool.query(sql);
+        return result.rows;
+    },
 }
 
 
