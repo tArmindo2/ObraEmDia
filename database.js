@@ -20,16 +20,28 @@ const pool = new Pool({
 
 //CRIAÇAO TABELAS NO BANCO
 //USUARIOS - const script = 'create table usuarios (id_usuario serial, login varchar (20) not null unique, senha varchar (20) not null, email varchar (50) not null unique, tipo bit not null, primary key(id_usuario))'; //tipo: -- 0 = cliente / 1 = empresa
+
 //CLIENTES - const script = 'CREATE TABLE IF NOT EXISTS clientes (id_cliente int not null, nome_cliente varchar (100), telefone varchar (12), primary key (id_cliente), foreign key (id_cliente) references usuarios (id_usuario))'
+
 //EMPRESAS - const script = 'CREATE TABLE IF NOT EXISTS empresas (id_empresa int not null, nome_empresa varchar (100) not null, descricao varchar (500) not null, telefone_um varchar (12) not null, telefone_dois varchar (12), estado varchar (100) not null, cidade varchar (500) not null, endereco varchar (500) not null, primary key (id_empresa), foreign key (id_empresa) references usuarios (id_usuario))' 
+
 //OBRAS - 
 //ETAPAS -
 
 //CRIAÇAO PROCEDURES
-//Clientes
+//Clientes ================================
 //const script = 'CREATE OR REPLACE FUNCTION addCliente (login varchar (20), senha varchar (20), email varchar(50), tipo bit, nome_cliente varchar (100), telefone varchar (12)) RETURNS void AS $$ BEGIN INSERT INTO usuarios VALUES (DEFAULT, login, senha, email, tipo); INSERT INTO clientes VALUES (LASTVAL(), nome_cliente, telefone); END $$ LANGUAGE plpgsql';
-//Empresas
+
+//Empresas ================================
 //const script = 'CREATE OR REPLACE FUNCTION addEmpresa (login varchar (20), senha varchar (20), email varchar(50), tipo bit, nome_empresa varchar (100), descricao varchar (500), telefone_um varchar (12), telefone_dois varchar (12), estado varchar (100), cidade varchar (500), endereco varchar (500)) RETURNS void AS $$ BEGIN INSERT INTO usuarios VALUES (DEFAULT, login, senha, email, tipo); INSERT INTO empresas VALUES (LASTVAL(), nome_empresa, descricao, telefone_um, telefone_dois, estado, cidade, endereco); END $$ LANGUAGE plpgsql';
+
+//const script = 'CREATE OR REPLACE FUNCTION updEmpresa (id int, nova_senha varchar (20), novo_email varchar(50), novo_nome_empresa varchar (100), nova_descricao varchar (500), novo_telefone_um varchar (12), novo_telefone_dois varchar (12), novo_estado varchar (100), nova_cidade varchar (500), novo_endereco varchar (500)) RETURNS void AS $$ BEGIN UPDATE usuarios SET senha = nova_senha, email = novo_email WHERE id_usuario = id; UPDATE empresas SET nome_empresa = novo_nome_empresa, descricao = nova_descricao, telefone_um = novo_telefone_um, telefone_dois = novo_telefone_dois, estado = novo_estado, cidade = nova_cidade, endereco = novo_endereco WHERE id_empresa = id; END $$ LANGUAGE plpgsql';
+
+const script = 'CREATE OR REPLACE FUNCTION delEmpresa (id int) RETURNS void AS $$ BEGIN DELETE FROM empresas WHERE id_empresa = id; DELETE FROM usuarios WHERE id_usuario = id; END $$ LANGUAGE plpgsql';
+
+
+
+
 
 /*   pool.query(script, function(error, result){
     if(error)
@@ -38,12 +50,13 @@ const pool = new Pool({
     console.log('Tabela criada com sucesso');
 })   */
 
- /*  pool.query(script, function(error, result){
+   pool.query(script, function(error, result){
     if(error)
         throw error;
     
     console.log('Procedure criada com sucesso');
-})   */
+})   
+
 
 module.exports = {
 
@@ -82,6 +95,7 @@ module.exports = {
         return result.rows;
     },
 
+    //============ CLIENTE ==================================================
     //MODULO DE CRIAÇÃO DO CLIENTE
     async createCliente(login, senha, email, tipo, nome_cliente, telefone){
         try{
@@ -94,13 +108,16 @@ module.exports = {
         }
     },
 
+    
     //MODULO DE LEITURA DO USUARIO + CLIENTE
     async readCliente(){
-        const sql = 'SELECT * FROM usuarios INNER JOIN clientes ON usuarios.id_usuario = clientes.id_cliente';
+        const sql = 'SELECT * FROM usuarios INNER JOIN clientes ON usuarios.id_usuario = clZientes.id_cliente';
         const result = await pool.query(sql);
         return result.rows;
     },
 
+    //============ EMPRESA ==================================================
+    
     //MODULO DE CRIAÇAO DE EMPRESA
     async createEmpresa(login, senha, email, tipo, nome_empresa, descricao, telefone_um, telefone_dois, estado, cidade, endereco){
         try{
@@ -117,6 +134,20 @@ module.exports = {
     async readEmpresa(){
         const sql = 'SELECT * FROM usuarios INNER JOIN empresas ON usuarios.id_usuario = empresas.id_empresa';
         const result = await pool.query(sql);
+        return result.rows;
+    },
+
+    //MODULO DE UPDATE DA EMPRESA
+    async upEmpresa(id, nova_senha, novo_email,novo_nome_empresa, nova_descricao, novo_telefone_um, novo_telefone_dois, novo_estado, nova_cidade, novo_endereco){
+        const sql = 'SELECT updEmpresa ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)';
+        const result = await pool.query(sql,[id, nova_senha, novo_email,novo_nome_empresa, nova_descricao, novo_telefone_um, novo_telefone_dois, novo_estado, nova_cidade, novo_endereco]);
+        return result.rows;
+    },
+
+    //MODULO DE DELETE DA EMPRESA
+    async deleteEmpresa(id){
+        const sql = 'SELECT delEmpresa ($1)';
+        const result = await pool.query(sql,[id]);
         return result.rows;
     },
 }

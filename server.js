@@ -43,13 +43,29 @@ server.post('/:contato', async function(request, response){
 
 })
 
+/* server.put('/:id', async function (request,response){
+    const id = request.params.id;
+    const nome = request.body.nome;
+    const telefone = request.body.telefone;
+
+    const result = await database.update(id, nome, telefone);
+    response.status(200).send(); //a maneira ideal seria verificar as linhas afetadas e retornar uma mensagem de erro ou sucesso
+}) */
+
+
+/* server.delete('/:id', async function (request, response){
+    const id = request.params.id;
+
+    const result = await database.delete(id);
+    response.status(200).send();//ideal colocar o delete e update dentro de try/catch para tratar excessões
+}) */
+
+//============ CLIENTE ==================================================
 //CRIAR CLIENTE
 server.post('/:cliente', async function(request, response){
     const {login, senha, email, tipo, nome_cliente, telefone} = request.body;
 
     const result = await database.createCliente(login, senha, email,tipo, nome_cliente, telefone);
-    
-    //contatos.push(contato); //adiciona o contato a lista de contato, semelhante ao append
 
     response.status(201).send();
 })
@@ -60,13 +76,12 @@ server.get('/:clientes', async function(request, response){
     response.json(clientes);
 })
 
+//============ EMPRESA ==================================================
 //CRIAR EMPRESA
 server.post('/', async function(request, response){
     const {login, senha, email, tipo, nome_empresa, descricao, telefone_um, telefone_dois, estado, cidade, endereco} = request.body;
 
     const result = await database.createEmpresa(login, senha, email, tipo, nome_empresa, descricao, telefone_um, telefone_dois, estado, cidade, endereco);
-    
-    //contatos.push(contato); //adiciona o contato a lista de contato, semelhante ao append
 
     response.status(201).send();
 })
@@ -77,6 +92,22 @@ server.get('/', async function(request, response){
     response.json(empresas);
 })
 
+//UPDATE USUARIO + EMPRESA
+server.put('/:id', async function (request,response){
+    const id = request.params.id;
+    const {nova_senha, novo_email,novo_nome_empresa, nova_descricao, novo_telefone_um, novo_telefone_dois, novo_estado, nova_cidade, novo_endereco} = request.body;
+
+    const result = await database.upEmpresa(id, nova_senha, novo_email,novo_nome_empresa, nova_descricao, novo_telefone_um, novo_telefone_dois, novo_estado, nova_cidade, novo_endereco);
+    response.status(200).send(); //a maneira ideal seria verificar as linhas afetadas e retornar uma mensagem de erro ou sucesso
+})
+
+//DELETE USUARIO + EMPRESA
+server.delete('/:id', async function (request, response){
+    const id = request.params.id;
+
+    const result = await database.deleteEmpresa(id);
+    response.status(200).send();//ideal colocar o delete e update dentro de try/catch para tratar excessões
+})
 
 
 server.listen(process.env.PORT || 3000);
