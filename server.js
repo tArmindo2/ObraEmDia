@@ -14,7 +14,7 @@ server.use(express.json()); //
 
 
 // localhost:3000/
-server.get('/:contatos', async function(request, response) { //request vem do cliente para o servidor, response vem do servidor para o cliente
+/* server.get('/:contatos', async function(request, response) { //request vem do cliente para o servidor, response vem do servidor para o cliente
 
 
     // /?nome=thiago (informação passada pela url) - request.query
@@ -23,16 +23,16 @@ server.get('/:contatos', async function(request, response) { //request vem do cl
 
     const contatos = await database.read();
     response.json(contatos);
-})
+}) */
 
 //localhost:3000/1
-server.get('/:id', async function(request, response) { //consultando pelo id
+/* server.get('/:id', async function(request, response) { //consultando pelo id
     const id = request.params.id;
     const contato = await database.find(id);
     response.json(contato);
-})
+}) */
 
-server.post('/:contato', async function(request, response){
+/* server.post('/:contato', async function(request, response){
     const {nome, telefone} = request.body;
 
     const result = await database.create(nome, telefone);
@@ -41,7 +41,7 @@ server.post('/:contato', async function(request, response){
 
     response.status(201).send();
 
-})
+}) */
 
 /* server.put('/:id', async function (request,response){
     const id = request.params.id;
@@ -62,7 +62,7 @@ server.post('/:contato', async function(request, response){
 
 //============ CLIENTE ==================================================
 //CRIAR CLIENTE
-server.post('/:cliente', async function(request, response){
+/* server.post('/:cliente', async function(request, response){
     const {login, senha, email, tipo, nome_cliente, telefone} = request.body;
 
     const result = await database.createCliente(login, senha, email,tipo, nome_cliente, telefone);
@@ -74,7 +74,7 @@ server.post('/:cliente', async function(request, response){
 server.get('/:clientes', async function(request, response){
     const clientes = await database.readCliente();
     response.json(clientes);
-})
+}) */
 
 //============ EMPRESA ==================================================
 //CRIAR EMPRESA
@@ -106,6 +106,40 @@ server.delete('/:id', async function (request, response){
     const id = request.params.id;
 
     const result = await database.deleteEmpresa(id);
+    response.status(200).send();//ideal colocar o delete e update dentro de try/catch para tratar excessões
+})
+
+//============ OBRA ==================================================
+//CRIAÇAO DE OBRAS
+server.post('/:id', async function(request, response){
+    const id_empresa = request.params.id;
+    const {nome_obra, data_inicio, data_termino, orcamento, nome_cliente, telefone_cliente, estado_obra, cidade_obra,  endereco_obra, status_obra} = request.body;
+
+    const result = await database.createObra(id_empresa, nome_obra, data_inicio, data_termino, orcamento, nome_cliente, telefone_cliente, estado_obra, cidade_obra,  endereco_obra, status_obra);
+
+    response.status(201).send();
+})
+
+//LEITURA DE OBRAS
+server.get('/:obras', async function(request, response){
+    const obras = await database.readObra();
+    response.json(obras);
+})
+
+//UPDATE DE OBRAS
+server.put('/obras/:id', async function (request,response){
+    const id = request.params.id;
+    const {new_nome_obra, new_data_inicio, new_data_termino, new_orcamento, new_nome_cliente, new_telefone_cliente, new_estado_obra, new_cidade_obra, new_endereco_obra, new_status_obra} = request.body;
+
+    const result = await database.upObras(id, new_nome_obra, new_data_inicio, new_data_termino, new_orcamento, new_nome_cliente, new_telefone_cliente, new_estado_obra, new_cidade_obra, new_endereco_obra, new_status_obra);
+    response.status(200).send(); //a maneira ideal seria verificar as linhas afetadas e retornar uma mensagem de erro ou sucesso
+})
+
+//DELETE OBRAS
+server.delete('/obras/:id', async function (request, response){
+    const id = request.params.id;
+
+    const result = await database.deleteObra(id);
     response.status(200).send();//ideal colocar o delete e update dentro de try/catch para tratar excessões
 })
 

@@ -25,7 +25,8 @@ const pool = new Pool({
 
 //EMPRESAS - const script = 'CREATE TABLE IF NOT EXISTS empresas (id_empresa int not null, nome_empresa varchar (100) not null, descricao varchar (500) not null, telefone_um varchar (12) not null, telefone_dois varchar (12), estado varchar (100) not null, cidade varchar (500) not null, endereco varchar (500) not null, primary key (id_empresa), foreign key (id_empresa) references usuarios (id_usuario))' 
 
-//OBRAS - 
+//OBRAS - const script = 'CREATE TABLE IF NOT EXISTS obras (id_obra serial, id_empresa int not null, nome_obra varchar (100) not null, data_inicio date not null, data_termino date not null, orcamento money, nome_cliente varchar (100) not null, telefone_cliente varchar (12) not null, estado_obra varchar (100) not null, cidade_obra varchar (500) not null, endereco_obra varchar (500) not null, status_obra int not null, primary key (id_obra), foreign key (id_empresa) references empresas (id_empresa))' //status_obra: -- 0 = agendada, 1 = em andamento, 2 = finalizada
+
 //ETAPAS -
 
 //CRIAÇAO PROCEDURES
@@ -37,25 +38,28 @@ const pool = new Pool({
 
 //const script = 'CREATE OR REPLACE FUNCTION updEmpresa (id int, nova_senha varchar (20), novo_email varchar(50), novo_nome_empresa varchar (100), nova_descricao varchar (500), novo_telefone_um varchar (12), novo_telefone_dois varchar (12), novo_estado varchar (100), nova_cidade varchar (500), novo_endereco varchar (500)) RETURNS void AS $$ BEGIN UPDATE usuarios SET senha = nova_senha, email = novo_email WHERE id_usuario = id; UPDATE empresas SET nome_empresa = novo_nome_empresa, descricao = nova_descricao, telefone_um = novo_telefone_um, telefone_dois = novo_telefone_dois, estado = novo_estado, cidade = nova_cidade, endereco = novo_endereco WHERE id_empresa = id; END $$ LANGUAGE plpgsql';
 
-const script = 'CREATE OR REPLACE FUNCTION delEmpresa (id int) RETURNS void AS $$ BEGIN DELETE FROM empresas WHERE id_empresa = id; DELETE FROM usuarios WHERE id_usuario = id; END $$ LANGUAGE plpgsql';
+//const script = 'CREATE OR REPLACE FUNCTION delEmpresa (id int) RETURNS void AS $$ BEGIN DELETE FROM empresas WHERE id_empresa = id; DELETE FROM usuarios WHERE id_usuario = id; END $$ LANGUAGE plpgsql';
+
+//Obras ====================================
+//const script = 'CREATE OR REPLACE FUNCTION addObra (id_empresa int, nome_obra varchar (100), data_inicio date, data_termino date, orcamento money, nome_cliente varchar (100), telefone_cliente varchar (12), estado_obra varchar (100), cidade_obra varchar (500), endereco_obra varchar (500), status_obra int) RETURNS void AS $$ BEGIN INSERT INTO obras VALUES (DEFAULT, id_empresa, nome_obra, data_inicio, data_termino, orcamento, nome_cliente, telefone_cliente, estado_obra, cidade_obra, endereco_obra, status_obra); END $$ LANGUAGE plpgsql';
+
+//const script = 'CREATE OR REPLACE FUNCTION updObra (id int, new_nome_obra varchar (100), new_data_inicio date, new_data_termino date, new_orcamento money, new_nome_cliente varchar (100), new_telefone_cliente varchar (12), new_estado_obra varchar (100), new_cidade_obra varchar (500), new_endereco_obra varchar (500), new_status_obra int) RETURNS void AS $$ BEGIN UPDATE obras SET nome_obra = new_nome_obra, data_inicio = new_data_inicio, data_termino = new_data_termino, orcamento = new_orcamento, nome_cliente = new_nome_cliente, telefone_cliente = new_telefone_cliente, estado_obra = new_estado_obra, cidade_obra = new_cidade_obra, endereco_obra = new_endereco_obra, status_obra = new_status_obra WHERE id_obra = id; END $$ LANGUAGE plpgsql';
 
 
 
-
-
-/*   pool.query(script, function(error, result){
+  /* pool.query(script, function(error, result){
     if(error)
         throw error;
     
     console.log('Tabela criada com sucesso');
-})   */
+}) */  
 
-   pool.query(script, function(error, result){
+  /*  pool.query(script, function(error, result){
     if(error)
         throw error;
     
     console.log('Procedure criada com sucesso');
-})   
+})    */
 
 
 module.exports = {
@@ -150,6 +154,42 @@ module.exports = {
         const result = await pool.query(sql,[id]);
         return result.rows;
     },
+
+    //============ OBRAS ==================================================
+    //MODULO CRIAÇAO DE OBRAS
+    async createObra(id_empresa, nome_obra, data_inicio, data_termino, orcamento, nome_cliente, telefone_cliente, estado_obra, cidade_obra,  endereco_obra, status_obra){
+        try{
+            const sql = 'SELECT addObra ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)';
+            const result = await pool.query(sql,[id_empresa, nome_obra, data_inicio, data_termino, orcamento, nome_cliente, telefone_cliente, estado_obra, cidade_obra,  endereco_obra, status_obra]);
+            return result.rows;
+        }catch(error){
+            console.log(error);
+            return -1;
+        }
+    },
+
+    //MODULO LEITURA DE OBRAS
+    async readObra(){
+        const sql = 'SELECT * FROM obras';
+        const result = await pool.query(sql);
+        return result.rows;
+    },
+
+    //MODULO UPDATE DE OBRAS
+    async upObras(id, new_nome_obra, new_data_inicio, new_data_termino, new_orcamento, new_nome_cliente, new_telefone_cliente, new_estado_obra, new_cidade_obra, new_endereco_obra, new_status_obra){
+        const sql = 'SELECT updObra ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)';
+        const result = await pool.query(sql,[id, new_nome_obra, new_data_inicio, new_data_termino, new_orcamento, new_nome_cliente, new_telefone_cliente, new_estado_obra, new_cidade_obra, new_endereco_obra, new_status_obra]);
+        return result.rows;
+    },
+
+    //MODULO DE DELETE DE OBRAS
+    async deleteObra(id){
+        const sql = 'DELETE FROM obras WHERE id_obra= $1';
+        const result = await pool.query(sql,[id]);
+        return result.rows;
+    },
+
+    //============ ETAPAS ==================================================
 }
 
 
