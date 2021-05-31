@@ -25,6 +25,7 @@ const pool = new Pool({
 
 //EMPRESAS - const script = 'CREATE TABLE IF NOT EXISTS empresas (id_empresa int not null, nome_empresa varchar (100) not null, descricao varchar (500) not null, telefone_um varchar (12) not null, telefone_dois varchar (12), estado varchar (100) not null, cidade varchar (500) not null, endereco varchar (500) not null, primary key (id_empresa), foreign key (id_empresa) references usuarios (id_usuario))' 
 
+
 //OBRAS - const script = 'CREATE TABLE IF NOT EXISTS obras (id_obra serial, id_empresa int not null, nome_obra varchar (100) not null, data_inicio date not null, data_termino date not null, orcamento money, nome_cliente varchar (100) not null, telefone_cliente varchar (12) not null, estado_obra varchar (100) not null, cidade_obra varchar (500) not null, endereco_obra varchar (500) not null, status_obra int not null, primary key (id_obra), foreign key (id_empresa) references empresas (id_empresa))' //status_obra: -- 0 = agendada, 1 = em andamento, 2 = finalizada
 
 //ETAPAS -
@@ -32,6 +33,10 @@ const pool = new Pool({
 //CRIAÇAO PROCEDURES
 //Clientes ================================
 //const script = 'CREATE OR REPLACE FUNCTION addCliente (login varchar (20), senha varchar (20), email varchar(50), tipo bit, nome_cliente varchar (100), telefone varchar (12)) RETURNS void AS $$ BEGIN INSERT INTO usuarios VALUES (DEFAULT, login, senha, email, tipo); INSERT INTO clientes VALUES (LASTVAL(), nome_cliente, telefone); END $$ LANGUAGE plpgsql';
+
+//const script = `CREATE OR REPLACE FUNCTION updCliente (id int, nova_senha varchar (20), novo_email varchar(50), novo_nome_cliente varchar (100), novo_telefone varchar (12)) RETURNS void AS $$ BEGIN UPDATE usuarios SET senha = nova_senha, email = novo_email WHERE id_usuario = id; UPDATE clientes SET nome_cliente = novo_nome_cliente, telefone = novo_telefone WHERE id_cliente = id; END $$ LANGUAGE plpgsql`;
+
+//const script = 'CREATE OR REPLACE FUNCTION delCliente (id int) RETURNS void AS $$ BEGIN DELETE FROM clientes WHERE id_cliente = id; DELETE FROM usuarios WHERE id_usuario = id; END $$ LANGUAGE plpgsql';
 
 //Empresas ================================
 //const script = 'CREATE OR REPLACE FUNCTION addEmpresa (login varchar (20), senha varchar (20), email varchar(50), tipo bit, nome_empresa varchar (100), descricao varchar (500), telefone_um varchar (12), telefone_dois varchar (12), estado varchar (100), cidade varchar (500), endereco varchar (500)) RETURNS void AS $$ BEGIN INSERT INTO usuarios VALUES (DEFAULT, login, senha, email, tipo); INSERT INTO empresas VALUES (LASTVAL(), nome_empresa, descricao, telefone_um, telefone_dois, estado, cidade, endereco); END $$ LANGUAGE plpgsql';
@@ -54,12 +59,12 @@ const pool = new Pool({
     console.log('Tabela criada com sucesso');
 }) */  
 
-  /*  pool.query(script, function(error, result){
+   /* pool.query(script, function(error, result){
     if(error)
         throw error;
     
     console.log('Procedure criada com sucesso');
-})    */
+}) */  
 
 
 module.exports = {
@@ -115,8 +120,22 @@ module.exports = {
     
     //MODULO DE LEITURA DO USUARIO + CLIENTE
     async readCliente(){
-        const sql = 'SELECT * FROM usuarios INNER JOIN clientes ON usuarios.id_usuario = clZientes.id_cliente';
+        const sql = 'SELECT * FROM usuarios INNER JOIN clientes ON usuarios.id_usuario = clientes.id_cliente';
         const result = await pool.query(sql);
+        return result.rows;
+    },
+
+    //MODULO DE UPDATE DO USUARIO + CLIENTE
+    async upCliente(id, nova_senha, novo_email, novo_nome, novo_telefone){
+        const sql = 'SELECT updCliente ($1, $2, $3, $4, $5)';
+        const result = await pool.query(sql,[id, nova_senha, novo_email, novo_nome, novo_telefone]);
+        return result.rows;
+    },
+
+    //MODULO DE DELETE DO USUARIO + CLIENTE
+    async deleteCliente(id){
+        const sql = 'SELECT delCliente ($1)';
+        const result = await pool.query(sql,[id]);
         return result.rows;
     },
 

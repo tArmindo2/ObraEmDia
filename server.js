@@ -62,7 +62,7 @@ server.use(express.json()); //
 
 //============ CLIENTE ==================================================
 //CRIAR CLIENTE
-/* server.post('/:cliente', async function(request, response){
+server.post('/', async function(request, response){
     const {login, senha, email, tipo, nome_cliente, telefone} = request.body;
 
     const result = await database.createCliente(login, senha, email,tipo, nome_cliente, telefone);
@@ -71,13 +71,30 @@ server.use(express.json()); //
 })
 
 //LER USUARIO + CLIENTE
-server.get('/:clientes', async function(request, response){
+server.get('/', async function(request, response){
     const clientes = await database.readCliente();
     response.json(clientes);
-}) */
+})
+
+//ATUALIZAR USUARIO + CLIENTE
+server.put('/:id', async function (request,response){
+    const id = request.params.id;
+    const {nova_senha, novo_email, novo_nome, novo_telefone} = request.body;
+
+    const result = await database.upCliente(id, nova_senha, novo_email, novo_nome, novo_telefone);
+    response.status(200).send(); //a maneira ideal seria verificar as linhas afetadas e retornar uma mensagem de erro ou sucesso
+})
+
+//DELETE USUARIO + CLIENTE
+server.delete('/:id', async function (request, response){
+    const id = request.params.id;
+
+    const result = await database.deleteCliente(id);
+    response.status(200).send();//ideal colocar o delete e update dentro de try/catch para tratar excessões
+})
 
 //============ EMPRESA ==================================================
-//CRIAR EMPRESA
+/* //CRIAR EMPRESA
 server.post('/', async function(request, response){
     const {login, senha, email, tipo, nome_empresa, descricao, telefone_um, telefone_dois, estado, cidade, endereco} = request.body;
 
@@ -107,11 +124,11 @@ server.delete('/:id', async function (request, response){
 
     const result = await database.deleteEmpresa(id);
     response.status(200).send();//ideal colocar o delete e update dentro de try/catch para tratar excessões
-})
+}) */
 
 //============ OBRA ==================================================
 //CRIAÇAO DE OBRAS
-server.post('/:id', async function(request, response){
+/* server.post('/:id', async function(request, response){
     const id_empresa = request.params.id;
     const {nome_obra, data_inicio, data_termino, orcamento, nome_cliente, telefone_cliente, estado_obra, cidade_obra,  endereco_obra, status_obra} = request.body;
 
@@ -141,7 +158,7 @@ server.delete('/obras/:id', async function (request, response){
 
     const result = await database.deleteObra(id);
     response.status(200).send();//ideal colocar o delete e update dentro de try/catch para tratar excessões
-})
+}) */
 
 
 server.listen(process.env.PORT || 3000);
