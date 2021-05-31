@@ -1,10 +1,12 @@
 const express = require('express'); //import express;
 const server = express();
+const cors = require('cors');
 
 const database = require('./database');
 
 //middleware, são como camadas, que o script ira executar entre os metodos, no caso esse permite que o express utilize o formato json em seus metodos
-server.use(express.json()); //
+server.use(express.json())
+server.use(cors())
 
 // HTTP REST
 //GET (OBTER UM RECURSO JSON) RESPONSAVEL POR LER UMA INFORMAÇÃO DA API - READ
