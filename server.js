@@ -64,7 +64,7 @@ server.use(cors())
 
 //============ CLIENTE ==================================================
 //CRIAR CLIENTE
-server.post('/', async function(request, response){
+/* server.post('/', async function(request, response){
     const {login, senha, email, tipo, nome_cliente, telefone} = request.body;
 
     const result = await database.createCliente(login, senha, email,tipo, nome_cliente, telefone);
@@ -93,10 +93,10 @@ server.delete('/:id', async function (request, response){
 
     const result = await database.deleteCliente(id);
     response.status(200).send();//ideal colocar o delete e update dentro de try/catch para tratar excessões
-})
+}) */
 
 //============ EMPRESA ==================================================
-/* //CRIAR EMPRESA
+//CRIAR EMPRESA
 server.post('/', async function(request, response){
     const {login, senha, email, tipo, nome_empresa, descricao, telefone_um, telefone_dois, estado, cidade, endereco} = request.body;
 
@@ -126,7 +126,7 @@ server.delete('/:id', async function (request, response){
 
     const result = await database.deleteEmpresa(id);
     response.status(200).send();//ideal colocar o delete e update dentro de try/catch para tratar excessões
-}) */
+})
 
 //============ OBRA ==================================================
 //CRIAÇAO DE OBRAS
