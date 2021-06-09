@@ -33,6 +33,7 @@ const pool = new Pool({
 //CRIAÇAO PROCEDURES
 //Clientes ================================
 //const script = 'CREATE OR REPLACE FUNCTION addCliente (login varchar (20), senha varchar (20), email varchar(50), tipo bit, nome_cliente varchar (100), telefone varchar (12)) RETURNS void AS $$ BEGIN INSERT INTO usuarios VALUES (DEFAULT, login, senha, email, tipo); INSERT INTO clientes VALUES (LASTVAL(), nome_cliente, telefone); END $$ LANGUAGE plpgsql';
+//const script = 'CREATE OR REPLACE FUNCTION addsCliente (login varchar (20), senha varchar (20), email varchar(50), tipo bit, nome_cliente varchar (100), telefone varchar (12)) RETURNS void AS $$ BEGIN INSERT INTO usuarios VALUES (DEFAULT, login, senha, email, tipo); INSERT INTO clientes VALUES (LASTVAL(), nome_cliente, telefone); END $$ LANGUAGE plpgsql';
 
 //const script = `CREATE OR REPLACE FUNCTION updCliente (id int, nova_senha varchar (20), novo_email varchar(50), novo_nome_cliente varchar (100), novo_telefone varchar (12)) RETURNS void AS $$ BEGIN UPDATE usuarios SET senha = nova_senha, email = novo_email WHERE id_usuario = id; UPDATE clientes SET nome_cliente = novo_nome_cliente, telefone = novo_telefone WHERE id_cliente = id; END $$ LANGUAGE plpgsql`;
 
@@ -64,7 +65,7 @@ const pool = new Pool({
         throw error;
     
     console.log('Procedure criada com sucesso');
-}) */  
+})  */ 
 
 
 module.exports = {
@@ -108,7 +109,7 @@ module.exports = {
     //MODULO DE CRIAÇÃO DO CLIENTE
     async createCliente(login, senha, email, tipo, nome_cliente, telefone){
         try{
-            const sql = 'SELECT addCliente ($1, $2, $3, $4, $5, $6)';
+            const sql = 'SELECT addsCliente ($1, $2, $3, $4, $5, $6)';
             const result = await pool.query(sql,[login, senha, email, tipo, nome_cliente, telefone]);
             return result.rows;
         }catch(error){
